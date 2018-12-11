@@ -1,0 +1,34 @@
+.semi-t{
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #bebebe;
+  font-size: 30;
+  color: #000000;
+  font-weight: 700;
+}
+/*表関連*/
+.hcl{
+color: #000000;
+background-color: #00ffd9;
+font-size: 17;
+font-weight: bold;
+text-align: center;
+}
+
+/*細かいタイトル*/
+.text{
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #ff7300;
+  font-size: 30;
+  color: #ffffff;
+  font-weight: 700;
+}
+td{
+  text-align: center;
+}
+tr{
+  text-align: center;
+}

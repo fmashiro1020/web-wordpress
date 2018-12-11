@@ -1,0 +1,137 @@
+<style>
+  /*.semi-t{
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      width: 700px;
+      background-color: #bebebe;
+      font-size: 30;
+      color: #000000;
+      font-weight: 700;
+  }*/
+  /*表関連*/
+  .hcl{
+    color: #000000;
+    background-color: #00ffd9;
+  }
+  .semi-t {
+    padding: 0.5em 1em;
+    margin: 2em 0;
+    color: #232323;
+    background: #fff8e8;
+    border-left: solid 10px #ffc06e;
+  }
+  .box8 p {
+      margin: 0;
+      padding: 0;
+  }
+</style>
+
+<div class="semi-t">１．前置き</div>
+今回は、Ubuntu 16.04 にowncloudをインストールしたいと思います。<br>
+owncloudとは、Dropboxのようなクラウドストレージサービスです。<br>
+私は仮想環境を使用していますが、仮想環境でなくても大丈夫です。
+
+ <div class="semi-t">２．サーバーアップデート</div>
+はじめにサーバーのアップデートを行いましょう。<br>
+sudo apt update
+sudo apt -y upgrade
+
+<div class="semi-t">３．WEB環境の構築</div>
+次にapache2のインストールと、PHP環境の構築を行います。<br>
+sudo apt -y install apache2
+sudo apt -y install php php-cgi libapache2-mod-php php-common php-pear php-mbstringphp-mysql php-zip php-intl php-curl php-gd
+sudo a2enconf php7.0-cgi
+sudo nano /etc/php/7.0/apache2/php.ini
+Ctrl + W を押し「date.timezone」を検索する
+;date.timezone =
+とあるので、
+date.timezone =　"Asia/Tokyo"
+とします。
+Ctrl + O
+Ctrl + X
+
+環境の構築が完了できたのかを確認するために、テストを行います。<br>
+sudo nano /var/www/html/index.php
+<html>
+<body>
+<div style="width: 100%; font-size: 40px; font-weight: bold; text-align:center;">
+<?php
+      print Date("Y/m/d");
+?>
+</div>
+</body>
+</html>
+Ctrl + O
+Ctrl + X
+ifconfig
+inetアドレス:xxx.xxx.xxx.xxx
+「x」の部分がサーバーのアドレスになります。
+このアドレスに別の端末のブラウザからアクセスします。
+このような画面が表示できたら成功です。
+
+<div class="semi-t">４．データベースの構築</div>
+次に、データベースの構築を行います。
+sudo apt -y install mariadb-server
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+character-set-server  = utf8
+#collation-server      = utf8mb4_general_ci
+sudo systemctl restart mysql
+
+sudo mysql_secure_installation
+n
+y
+y
+y
+y
+
+sudo mysql
+select user,host,password from mysql.user;
+show databases;
+exit
+
+<div class="semi-t">５．owncloud　インストール</div>
+ではいよいよowncoudをインストールしていきます。
+wget https://download.owncloud.org/download/repositories/stable/Ubuntu_16.04/Release.key
+sudo apt-key add Release.key
+sudo nano /etc/apt/sources.list.d/owncloud.list
+deb http://download.owncloud.org/download/repositories/stable/Ubuntu_16.04/ /
+sudo apt update
+sudo apt -y install owncloud-files
+sudo nano /etc/apache2/conf-available/owncloud.conf
+Alias /owncloud /var/www/owncloud
+<Directory /var/www/owncloud>
+</Directory>
+sudo a2enconf owncloud
+sudo systemctl restart apache2
+owncloud用のデータベースを作成します。
+sudo mysql
+create database owncloud;
+最後のowncloudの部分は作成するデータベースの名前を入力します。<br>
+今回は、「owncloud」と入力しました。
+grant all privileges on owncloud.* to owncloud@'localhost' identified by 'password';
+[owncloud@'localhjost']のowncloudの部分に作成するユーザー名を入力します。<br>
+最後の「password」の部分に今回作成するユーザーのパスワードを入力します。<br>
+flush privileges;a
+exit
+
+<div class="semi-t">６．初期設定</div>
+環境の構築が完了したので、初期設定を行います。<br>
+ブラウザから「http://xxx.xxx.xxx.xxx/owncloud」にアクセスします。<br>
+※「ｘ」の部分にはサーバーのアドレスが入ります。<br>
+すると、このような画面になると思いますので、入力を行なってください。<br>
+管理者アカウントの作成を行います。<br>
+ユーザー名とパスワードの欄には、ご自分で好きに入力してください。<br>
+このユーザー名とパスワードはowncloudへアクセスする際に必要となりますので、忘れないようにしてください。<br>
+
+次にデータベースの設定を行なっていきます。<br>
+データベースのユーザー名、パスワード、データベース名は「４．owncloud　インストール」で行った「owncloud用のデータベースの作成」
+で設定したものを使用します。<br>
+今回は、ユーザー名を「owncloud」、パスワードを「password」、データベース名「owncloud」と設定したので入力します。<br>
+データベースホスト名には、「localhost」と入力します。<br>
+最後に下にある「セットアップを完了します」をクリックし、数分待ち、画面が切り替わったら初期設定完了です。<br>
+
+<div class="semi-t">７．まとめ</div>
+今回は、Ubuntu16.04へ「owncloud」をインストールしてみました。<br>
+とても難しそうに見えますが、とても簡単なので、みなさんも試してみてください。<br>
+今回はご閲覧誠にありがとうございました。<br>
